@@ -14,7 +14,7 @@ namespace VTS_HDScreenshot
     {
         public const string GUID = "me.xiaoye97.plugin.VTubeStudio.VTS_HDScreenshot";
         public const string PluginName = "VTS_HDScreenshot";
-        public const string VERSION = "1.0.0";
+        public const string VERSION = "1.1.0";
         private CircleButtonController CircleButtonController;
         private RectTransform CircleButtonControllerRT;
         private Camera live2dCamera;
@@ -56,6 +56,10 @@ namespace VTS_HDScreenshot
                 if (GUILayout.Button("8K"))
                 {
                     Capture(7680, 4320);
+                }
+                if (GUILayout.Button("16K"))
+                {
+                    Capture(15360, 8640);
                 }
                 GUILayout.EndHorizontal();
             }
