@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BepInEx;
+using System.IO;
 using UnityEngine;
+using System.Collections;
+using InfoWindowNamespace;
 
 namespace VTS_HDScreenshot
 {
@@ -14,7 +12,7 @@ namespace VTS_HDScreenshot
     {
         public const string GUID = "me.xiaoye97.plugin.VTubeStudio.VTS_HDScreenshot";
         public const string PluginName = "VTS_HDScreenshot";
-        public const string VERSION = "1.1.0";
+        public const string VERSION = "1.2.0";
         private CircleButtonController CircleButtonController;
         private RectTransform CircleButtonControllerRT;
         private Camera live2dCamera;
@@ -88,8 +86,18 @@ namespace VTS_HDScreenshot
             mCamera.targetTexture = null;
             Destroy(mRender);
             byte[] bytes = mTexture.EncodeToPNG();
-            System.IO.File.WriteAllBytes(fileName, bytes);
-            Debug.Log($"截图保存到了{fileName}");
+            FileInfo fileinfo = new FileInfo(fileName);
+            if (!fileinfo.Directory.Exists)
+            {
+                fileinfo.Directory.Create();
+            }
+            File.WriteAllBytes(fileinfo.FullName, bytes);
+            Debug.Log($"截图保存到了{fileinfo.FullName}");
+            var infoWindow = GameObject.FindObjectOfType<InfoWindow>();
+            if (infoWindow != null )
+            {
+                infoWindow.ShowInfo(string.Format(L.GetString("saved_screenshot_path", null), fileinfo.FullName), null, false, false, -1, "m_inf_b_1");
+            }
         }
     }
 }
