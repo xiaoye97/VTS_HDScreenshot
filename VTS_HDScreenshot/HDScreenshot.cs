@@ -12,7 +12,7 @@ namespace VTS_HDScreenshot
     {
         public const string GUID = "me.xiaoye97.plugin.VTubeStudio.VTS_HDScreenshot";
         public const string PluginName = "VTS_HDScreenshot";
-        public const string VERSION = "1.4.0";
+        public const string VERSION = "1.5.0";
         private CircleButtonController CircleButtonController;
         private RectTransform CircleButtonControllerRT;
         private Camera live2dCamera;
