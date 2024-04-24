@@ -4,6 +4,8 @@ using System.IO;
 using UnityEngine;
 using System.Collections;
 using InfoWindowNamespace;
+using System.Reflection;
+using System.Collections.Generic;
 
 namespace VTS_HDScreenshot
 {
@@ -12,13 +14,16 @@ namespace VTS_HDScreenshot
     {
         public const string GUID = "me.xiaoye97.plugin.VTubeStudio.VTS_HDScreenshot";
         public const string PluginName = "VTS_HDScreenshot";
-        public const string VERSION = "1.5.0";
+        public const string VERSION = "1.6.0";
         private CircleButtonController CircleButtonController;
         private RectTransform CircleButtonControllerRT;
         private Camera live2dCamera;
+        private MethodInfo ShowInfoMethod;
+        private List<object> showInfoOutherParams;
 
         private void Start()
         {
+            InitShowInfo();
         }
 
         private void Update()
@@ -93,10 +98,57 @@ namespace VTS_HDScreenshot
             }
             File.WriteAllBytes(fileinfo.FullName, bytes);
             Debug.Log($"截图保存到了{fileinfo.FullName}");
-            var infoWindow = GameObject.FindObjectOfType<InfoWindow>();
-            if (infoWindow != null )
+            ShowInfo(string.Format(L.GetString("saved_screenshot_path", null), fileinfo.FullName));
+        }
+
+        private void InitShowInfo()
+        {
+            Type type = typeof(InfoWindow);
+            ShowInfoMethod = type.GetMethod("ShowInfo");
+            var ps = ShowInfoMethod.GetParameters();
+            showInfoOutherParams = new List<object>();
+            for (int i = 1; i < ps.Length; i++)
             {
-                infoWindow.ShowInfo(string.Format(L.GetString("saved_screenshot_path", null), fileinfo.FullName), null, false, false, -1, "m_inf_b_1");
+                var p = ps[i];
+                if (p.HasDefaultValue)
+                {
+                    showInfoOutherParams.Add(p.DefaultValue);
+                }
+                else
+                {
+                    if (p.ParameterType == typeof(string))
+                    {
+                        showInfoOutherParams.Add("");
+                    }
+                    else if (p.ParameterType == typeof(bool))
+                    {
+                        showInfoOutherParams.Add(false);
+                    }
+                    else if (p.ParameterType == typeof(int))
+                    {
+                        showInfoOutherParams.Add(0);
+                    }
+                    else if (p.ParameterType == typeof(float))
+                    {
+                        showInfoOutherParams.Add(0);
+                    }
+                    else if (p.ParameterType == typeof(double))
+                    {
+                        showInfoOutherParams.Add(0);
+                    }
+                }
+            }
+        }
+
+        private void ShowInfo(string message)
+        {
+            var infoWindow = GameObject.FindObjectOfType<InfoWindow>();
+            var paramList = new List<object>();
+            paramList.Add(message);
+            paramList.AddRange(showInfoOutherParams);
+            if (infoWindow != null)
+            {
+                ShowInfoMethod.Invoke(infoWindow, paramList.ToArray());
             }
         }
     }
